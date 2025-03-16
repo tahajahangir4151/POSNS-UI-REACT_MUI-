@@ -79,6 +79,18 @@ const DashboardCharts = ({ data }) => {
     }));
   };
 
+  const calculateQtyPercentages = (qtyData, totalQty) => {
+    if (!qtyData || qtyData.length === 0) return [];
+    return qtyData.map((item) => ({
+      name: item.productName,
+      value:
+        totalQty === 0
+          ? 0
+          : Number(((item.totalQty / totalQty) * 100).toFixed(1)),
+      totalQty: item.totalQty,
+    }));
+  };
+
   //useState
   const salesData = [
     { name: "Restaurant", amount: data?.totalRestSale || 0 },
@@ -120,6 +132,11 @@ const DashboardCharts = ({ data }) => {
     }
     return <></>;
   };
+
+  const foodDataByQty = calculateQtyPercentages(
+    data?.top4ProdSalesByQty || [],
+    data?.top4ProdSalesByQty.reduce((acc, item) => acc + item.totalQty, 0) || 0
+  );
 
   return (
     <Box style={{ padding: 16 }}>
@@ -192,11 +209,72 @@ const DashboardCharts = ({ data }) => {
           <Divider style={{ backgroundColor: "#008000", height: "2px" }} />
         </Grid>
 
-        {/* Popular Foods Chart */}
+        {/* Popular Foods Chart by QTY */}
         <Grid item xs={12} md={6} lg={4}>
           <Paper elevation={0} className={classes.paper}>
             <Typography variant="h6" style={{ marginBottom: 16 }}>
               Most Popular Food
+            </Typography>
+            <Box className={classes.chartContainer}>
+              <Box
+                className={classes.chartBox}
+                style={{ height: isMobile ? 200 : 250 }}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={foodDataByQty}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {foodDataByQty.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={foodColors[index % foodColors.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+              <Box className={classes.legendBox}>
+                {foodDataByQty.map((item, index) => (
+                  <Box key={index} className={classes.legendItem}>
+                    <Box
+                      className={classes.legendColorBox}
+                      style={{
+                        backgroundColor: foodColors[index % foodColors.length],
+                      }}
+                    />
+                    <Typography variant="body2">
+                      <Typography
+                        style={{ fontWeight: "bold" }}
+                        variant="body2"
+                      >
+                        {item.name}
+                      </Typography>{" "}
+                      {item.totalQty} ({Math.round(item.value)}%)
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider style={{ backgroundColor: "#008000", height: "2px" }} />
+        </Grid>
+
+        {/* Popular Foods Chart by Sales Amount */}
+        <Grid item xs={12} md={6} lg={4}>
+          <Paper elevation={0} className={classes.paper}>
+            <Typography variant="h6" style={{ marginBottom: 16 }}>
+              Top Food By Sales
             </Typography>
             <Box className={classes.chartContainer}>
               <Box

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   AppBar,
   Toolbar,
@@ -87,6 +87,8 @@ const Header = ({ data }) => {
   const [dateError, setDateError] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
   const [open, setOpen] = useState(false);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const initialLoadRef = useRef(false);
 
   const theme = useTheme();
   useEffect(() => {
@@ -248,9 +250,14 @@ const Header = ({ data }) => {
     }
   }, [isMobile, fromDate, toDate, dispatch]);
 
-  // const compInfo = Array.isArray(data?.companyInfo) ? data.companyInfo : [];
+  const handleBranchClick = (branchCode) => {
+    console.log("branchCode", branchCode);
+    setMobileOpen(false);
+  };
 
-  const compInfo = data?.companyInfo;
+  const compInfo = Array.isArray(data?.companyInfo) ? data.companyInfo : [];
+
+  // const compInfo = data?.companyInfo;
   return (
     <>
       <AppBar
@@ -262,32 +269,104 @@ const Header = ({ data }) => {
         }}
       >
         <Toolbar>
-          <IconButton
-            edge="start"
-            onClick={handleDrawerToggle}
-            style={{
-              color: "#ffffff",
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-              },
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-
+          {isMobile && (
+            <IconButton
+              edge="start"
+              onClick={handleDrawerToggle}
+              style={{
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                },
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Typography
             variant="h6"
             component="div"
             style={{
               flexGrow: 1,
               color: "#ffffff",
-              textAlign: "center",
+              textAlign: isMobile ? "center" : "left",
               fontSize: "1.1rem",
               fontWeight: 500,
             }}
           >
             {compInfo?.length > 0 && compInfo[0].compName}
           </Typography>
+
+          {!isMobile && (
+            <Box
+              style={{
+                display: "flex",
+                gap: 24,
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)",
+                alignItems: "center",
+              }}
+            >
+              <Box style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Typography style={{ color: "#ffffff", minWidth: "45px" }}>
+                  From:
+                </Typography>
+                {/* <TextField
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                    setDateError("");
+                  }}
+                  size="small"
+                  error={!!dateError}
+                  style={commonTextFieldStyles}
+                  InputProps={{
+                    classes: {
+                      inputMarginDense: classes.inputMarginDense,
+                    },
+                  }}
+                /> */}
+                <DatePicker
+                  color="#ffffff"
+                  setValue={setFromDate}
+                  value={fromDate}
+                />
+              </Box>
+              <Box style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Typography style={{ color: "#ffffff", minWidth: "45px" }}>
+                  To:
+                </Typography>
+                {/* <TextField
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                    setDateError("");
+                  }}
+                  size="small"
+                  error={!!dateError}
+                  style={commonTextFieldStyles}
+                  InputProps={{
+                    classes: {
+                      inputMarginDense: classes.inputMarginDense,
+                    },
+                  }}
+                /> */}
+                <DatePicker
+                  color="#ffffff"
+                  setValue={setToDate}
+                  value={toDate}
+                />
+              </Box>
+              {dateError && (
+                <Typography style={{ color: "#ffffff", fontSize: "0.75rem" }}>
+                  {dateError}
+                </Typography>
+              )}
+            </Box>
+          )}
 
           <IconButton
             size="large"
@@ -372,13 +451,25 @@ const Header = ({ data }) => {
             }}
           >
             {[
-              "All",
+              ...(compInfo?.length > 1 ? ["All"] : []),
               ...compInfo
                 ?.sort((a, b) => a.branchCode - b.branchCode)
                 .map((item, index) => item.branchName),
             ].map((menuItem, index, array) => (
               <React.Fragment key={index}>
-                <ListItem className={classes.listItem}>
+                <ListItem
+                  className={classes.listItem}
+                  button
+                  onClick={() =>
+                    handleBranchClick(
+                      menuItem === "All"
+                        ? 0
+                        : compInfo.find(
+                            (branch) => branch.branchName === menuItem
+                          )?.branchCode
+                    )
+                  }
+                >
                   <Typography style={{ fontSize: "12px" }}>
                     {menuItem}
                   </Typography>

@@ -56,6 +56,7 @@ const DashboardCards = ({ data }) => {
   const discBreakdown = [
     { label: "Restaurant", orders: data?.totalOtherDisc || 0 },
     { label: "Owner", orders: data?.totalOwnerDisc || 0 },
+    { label: "Bank", orders: data?.totalBankDisc || 0 },
     { label: "Complimentary", orders: data?.totalComplimentary || 0 },
   ];
 
@@ -64,6 +65,7 @@ const DashboardCards = ({ data }) => {
     data?.totalOtherDisc ||
     0 + data?.totalOwnerDisc ||
     0 + data?.totalComplimentary ||
+    0 + data?.totalBankDisc ||
     0;
 
   // Render Discount breakdown in the specified order
@@ -96,7 +98,10 @@ const DashboardCards = ({ data }) => {
               fontSize: isMobile ? "1rem" : "0.875rem",
             }}
           >
-            {orders}
+            {Math.round(orders).toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </Typography>
         </Box>
       </Box>

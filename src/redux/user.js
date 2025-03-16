@@ -278,38 +278,39 @@ const getSalesPersonBegin = () => async (dispatch) => {
     });
 };
 
-const getOrdersByLoggedInWaiter = (waiterId, selectedDate) => async (dispatch) => {
-  if (!isBaseUrlSet) await setBaseUrl();
+const getOrdersByLoggedInWaiter =
+  (waiterId, selectedDate) => async (dispatch) => {
+    if (!isBaseUrlSet) await setBaseUrl();
 
-  dispatch({
-    type: ACTIONS.GET_ORDER_DETAILS_BEGIN,
-  });
-
-  dispatch({
-    type: ACTIONS.GET_ORDER_BY_WAITER_ID.PENDING,
-    loading: true,
-  });
-  axios({
-    method: "get",
-    url: `${BASE_URL}/GetOrdersByWaiterId/${waiterId}?date=${selectedDate}`,
-  })
-    .then(function (response) {
-      dispatch({
-        type: ACTIONS.GET_ORDER_BY_WAITER_ID.SUCCESS,
-        loading: false,
-        data: response.data,
-      });
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error.response);
-      dispatch({
-        type: ACTIONS.GET_ORDER_BY_WAITER_ID.ERROR,
-        loading: false,
-        error: true,
-      });
+    dispatch({
+      type: ACTIONS.GET_ORDER_DETAILS_BEGIN,
     });
-};
+
+    dispatch({
+      type: ACTIONS.GET_ORDER_BY_WAITER_ID.PENDING,
+      loading: true,
+    });
+    axios({
+      method: "get",
+      url: `${BASE_URL}/GetOrdersByWaiterId/${waiterId}?date=${selectedDate}`,
+    })
+      .then(function (response) {
+        dispatch({
+          type: ACTIONS.GET_ORDER_BY_WAITER_ID.SUCCESS,
+          loading: false,
+          data: response.data,
+        });
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error.response);
+        dispatch({
+          type: ACTIONS.GET_ORDER_BY_WAITER_ID.ERROR,
+          loading: false,
+          error: true,
+        });
+      });
+  };
 
 const getOrderDetails = (orderNo) => async (dispatch) => {
   if (!isBaseUrlSet) await setBaseUrl();
@@ -343,45 +344,46 @@ const getOrderDetails = (orderNo) => async (dispatch) => {
     });
 };
 
-const getSubCategoriesByIdBegin = (id, selectedCategoryId) => async (dispatch) => {
-  if (!isBaseUrlSet) await setBaseUrl();
+const getSubCategoriesByIdBegin =
+  (id, selectedCategoryId) => async (dispatch) => {
+    if (!isBaseUrlSet) await setBaseUrl();
 
-  dispatch({
-    type: ACTIONS.GET_SUBCATEGORIES_BY_ID_BEGIN,
-  });
-  dispatch({
-    type: ACTIONS.SET_SELECTED_CATEGORY_ID,
-    id: selectedCategoryId,
-  });
-  dispatch({
-    type: ACTIONS.GET_SUBCATEGORIES_BY_ID.PENDING,
-    loading: true,
-  });
-  axios({
-    method: "get",
-    url: `${BASE_URL}/Items/${id}`,
-  })
-    .then(function (response) {
-      dispatch({
-        type: ACTIONS.GET_SUBCATEGORIES_BY_ID.SUCCESS,
-        loading: false,
-        data: response.data,
-        categoryId: id,
-      });
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error.response);
-      dispatch({
-        type: ACTIONS.GET_SUBCATEGORIES_BY_ID.ERROR,
-        loading: false,
-        error: true,
-      });
-    })
-    .then(function () {
-      // always executed
+    dispatch({
+      type: ACTIONS.GET_SUBCATEGORIES_BY_ID_BEGIN,
     });
-};
+    dispatch({
+      type: ACTIONS.SET_SELECTED_CATEGORY_ID,
+      id: selectedCategoryId,
+    });
+    dispatch({
+      type: ACTIONS.GET_SUBCATEGORIES_BY_ID.PENDING,
+      loading: true,
+    });
+    axios({
+      method: "get",
+      url: `${BASE_URL}/Items/${id}`,
+    })
+      .then(function (response) {
+        dispatch({
+          type: ACTIONS.GET_SUBCATEGORIES_BY_ID.SUCCESS,
+          loading: false,
+          data: response.data,
+          categoryId: id,
+        });
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error.response);
+        dispatch({
+          type: ACTIONS.GET_SUBCATEGORIES_BY_ID.ERROR,
+          loading: false,
+          error: true,
+        });
+      })
+      .then(function () {
+        // always executed
+      });
+  };
 
 export const setSelectedCategory = (id) => (dispatch) => {
   dispatch({
@@ -542,34 +544,35 @@ export const updatePasswordBegin = (payload) => async (dispatch) => {
 
 // Get Dashboard Data
 
-export const getDataFromDashboard = (fromDate, toDate, userId) => async (dispatch) => {
-  if (!isBaseUrlSet) await setBaseUrl();
+export const getDataFromDashboard =
+  (fromDate, toDate, userId) => async (dispatch) => {
+    if (!isBaseUrlSet) await setBaseUrl();
 
-  // debugger;
-  // Format the date exactly as required
-  const formattedFromDate = dayjs(fromDate).format("MM-DD-YYYY hh:mm:ss A");
-  const formattedToDate = dayjs(toDate).format("MM-DD-YYYY hh:mm:ss A");
+    // debugger;
+    // Format the date exactly as required
+    const formattedFromDate = dayjs(fromDate).format("MM-DD-YYYY hh:mm:ss A");
+    const formattedToDate = dayjs(toDate).format("MM-DD-YYYY hh:mm:ss A");
 
-  // Construct the URL manually to prevent encoding
-  const url = `${BASE_URL}/GetDataForDashboard?fromDate=${formattedFromDate}&toDate=${formattedToDate}&userId=${userId}`;
+    // Construct the URL manually to prevent encoding
+    const url = `${BASE_URL}/GetDataForDashboard?fromDate=${formattedFromDate}&toDate=${formattedToDate}&userId=${userId}`;
 
-  dispatch({ type: ACTIONS.GET_DASHBOARD_DATA.PENDING });
+    dispatch({ type: ACTIONS.GET_DASHBOARD_DATA.PENDING });
 
-  axios
-    .get(url) // Do NOT pass `params` to prevent auto-encoding
-    .then((response) => {
-      dispatch({
-        type: ACTIONS.GET_DASHBOARD_DATA.SUCCESS,
-        data: response.data,
+    axios
+      .get(url) // Do NOT pass `params` to prevent auto-encoding
+      .then((response) => {
+        dispatch({
+          type: ACTIONS.GET_DASHBOARD_DATA.SUCCESS,
+          data: response.data,
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: ACTIONS.GET_DASHBOARD_DATA.ERROR,
+          error: error.message,
+        });
       });
-    })
-    .catch((error) => {
-      dispatch({
-        type: ACTIONS.GET_DASHBOARD_DATA.ERROR,
-        error: error.message,
-      });
-    });
-};
+  };
 
 export const setItemsQuantity =
   (quantity = 0, rowId) =>
