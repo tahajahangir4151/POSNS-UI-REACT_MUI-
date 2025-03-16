@@ -26,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions, getDataFromDashboard } from "../../redux/user";
 import ChangePwd from "../../Components/ChangePwd";
 import DatePicker from "../../Components/DatePicker";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 const useStyles = makeStyles((theme) => ({
   inputMarginDense: {
@@ -42,6 +43,37 @@ const useStyles = makeStyles((theme) => ({
   card: {
     marginTop: theme.spacing(2),
   },
+  drawerPaper: {
+    width: 180,
+  },
+
+  drawerHeader: {
+    display: "flex",
+    padding: theme.spacing(1),
+    backgroundColor: "#F8F8F8",
+    color: "#000000",
+    fontSize: "1.1rem",
+  },
+
+  backIcon: {
+    color: "#FF5800",
+    display: "flex",
+    justifyContent: "flex-start",
+  },
+  menuHeading: {
+    fontSize: "1.1rem",
+    fontWeight: "500",
+    fontStyle: "italic",
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+    marginLeft: "5px",
+    fontFamily: "Roboto sans-serif",
+  },
+  listItem: {
+    "&:hover": {
+      backgroundColor: "#fff5f0",
+    },
+  },
 }));
 
 const Header = ({ data }) => {
@@ -57,20 +89,15 @@ const Header = ({ data }) => {
   const [open, setOpen] = useState(false);
 
   const theme = useTheme();
-  // debugger;
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 600);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  // const isMobile = useMediaQuery("(max-width:600px)");
-  console.log("SM value", useMediaQuery(theme.breakpoints.down("sm")));
-  console.log(isMobile);
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
   const userId = useSelector((state) => state.user.loggedInUserId);
 
-  //handle Channge Password
   const handleChangePassword = (
     password,
     confirmPassword,
@@ -96,9 +123,6 @@ const Header = ({ data }) => {
     }
 
     const payload = { userId, Pwd: password };
-
-    console.log("Payload:", payload); // Debugging line to check payload
-
     dispatch(actions.updatePasswordBegin(payload));
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 3000);
@@ -118,7 +142,6 @@ const Header = ({ data }) => {
   };
 
   const validateDates = () => {
-    // debugger
     setDateError("");
 
     if (!fromDate || !toDate) {
@@ -152,13 +175,6 @@ const Header = ({ data }) => {
       new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
       false
     );
-    console.log(
-      "Refresh Called with already given dates",
-      "From:",
-      formattedFromDate,
-      "To:",
-      formattedToDate
-    );
     dispatch(getDataFromDashboard(formattedFromDate, formattedToDate));
   };
 
@@ -173,7 +189,6 @@ const Header = ({ data }) => {
   useEffect(() => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // Sockets for auto refresh
     const interval = setInterval(() => {
       if (fromDate && toDate) {
         handleRefresh();
@@ -208,8 +223,6 @@ const Header = ({ data }) => {
   };
 
   useEffect(() => {
-    // debugger;
-    console.log(isMobile);
     if (isMobile === true) {
       if (validateDates()) {
         const formattedFromDate = formatDate(fromDate, true);
@@ -217,7 +230,9 @@ const Header = ({ data }) => {
           new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
           false
         );
-        dispatch(getDataFromDashboard(formattedFromDate, formattedToDate));
+        dispatch(
+          getDataFromDashboard(formattedFromDate, formattedToDate, userId)
+        );
       }
     } else {
       if (validateDates()) {
@@ -226,16 +241,16 @@ const Header = ({ data }) => {
           new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
           false
         );
-        dispatch(getDataFromDashboard(formattedFromDate, formattedToDate));
-        // console.log("API Call on Page Load in desktop");
+        dispatch(
+          getDataFromDashboard(formattedFromDate, formattedToDate, userId)
+        );
       }
     }
   }, [isMobile, fromDate, toDate, dispatch]);
 
-  //Company Info
-  const compInfo = data?.companyInfo;
-  console.log(compInfo);
+  // const compInfo = Array.isArray(data?.companyInfo) ? data.companyInfo : [];
 
+  const compInfo = data?.companyInfo;
   return (
     <>
       <AppBar
@@ -247,20 +262,18 @@ const Header = ({ data }) => {
         }}
       >
         <Toolbar>
-          {/* {isMobile && (
-            <IconButton
-              edge="start"
-              onClick={handleDrawerToggle}
-              style={{
-                color: "#ffffff",
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )} */}
+          <IconButton
+            edge="start"
+            onClick={handleDrawerToggle}
+            style={{
+              color: "#ffffff",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
 
           <Typography
             variant="h6"
@@ -268,84 +281,13 @@ const Header = ({ data }) => {
             style={{
               flexGrow: 1,
               color: "#ffffff",
-              textAlign: "left",
+              textAlign: "center",
               fontSize: "1.1rem",
               fontWeight: 500,
             }}
           >
-            {compInfo?.map((item) => item.compName)}
+            {compInfo?.length > 0 && compInfo[0].compName}
           </Typography>
-
-          {!isMobile && (
-            <Box
-              style={{
-                display: "flex",
-                gap: 24,
-                position: "absolute",
-                left: "50%",
-                transform: "translateX(-50%)",
-                alignItems: "center",
-              }}
-            >
-              <Box style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Typography style={{ color: "#ffffff", minWidth: "45px" }}>
-                  From:
-                </Typography>
-                {/* <TextField
-                  type="date"
-                  value={fromDate}
-                  onChange={(e) => {
-                    setFromDate(e.target.value);
-                    setDateError("");
-                  }}
-                  size="small"
-                  error={!!dateError}
-                  style={commonTextFieldStyles}
-                  InputProps={{
-                    classes: {
-                      inputMarginDense: classes.inputMarginDense,
-                    },
-                  }}
-                /> */}
-                <DatePicker
-                  color="#ffffff"
-                  setValue={setFromDate}
-                  value={fromDate}
-                />
-              </Box>
-              <Box style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Typography style={{ color: "#ffffff", minWidth: "45px" }}>
-                  To:
-                </Typography>
-                {/* <TextField
-                  type="date"
-                  value={toDate}
-                  onChange={(e) => {
-                    setToDate(e.target.value);
-                    setDateError("");
-                  }}
-                  size="small"
-                  error={!!dateError}
-                  style={commonTextFieldStyles}
-                  InputProps={{
-                    classes: {
-                      inputMarginDense: classes.inputMarginDense,
-                    },
-                  }}
-                /> */}
-                <DatePicker
-                  color="#ffffff"
-                  setValue={setToDate}
-                  value={toDate}
-                />
-              </Box>
-              {dateError && (
-                <Typography style={{ color: "#ffffff", fontSize: "0.75rem" }}>
-                  {dateError}
-                </Typography>
-              )}
-            </Box>
-          )}
 
           <IconButton
             size="large"
@@ -378,7 +320,7 @@ const Header = ({ data }) => {
             onClose={handleClose}
             classes={{ paper: classes.menuPaper }}
           >
-            <MenuItem onClick={() => setOpen(true)}>Change Password</MenuItem>{" "}
+            <MenuItem onClick={() => setOpen(true)}>Change Password</MenuItem>
             <ChangePwd
               open={open}
               handleClose={() => setOpen(false)}
@@ -394,79 +336,60 @@ const Header = ({ data }) => {
               Logout
             </MenuItem>
           </Menu>
-
-          {/* <Drawer
-          anchor="left"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          PaperProps={{
-            style: {
-              backgroundColor: "#ffffff",
-              "& .MuiListItem-root": {
-                color: "#333333",
-              },
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer> */}
         </Toolbar>
       </AppBar>
-      {/* {isMobile && (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 2,
-            mt: 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
+
+      <Drawer
+        anchor="left"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        classes={{ paper: classes.drawerPaper }}
+      >
+        <IconButton className={classes.backIcon} onClick={handleDrawerToggle}>
+          <ArrowBackIcon />
+        </IconButton>
+        {/* Company Name at the top */}
+        <Box className={classes.drawerHeader}>
+          <Typography variant="h6">
+            {compInfo?.length > 0 && compInfo[0].compName}
+          </Typography>
+        </Box>
+        <Divider />
+        {/* Menu Items */}
+        <Box>
+          <Typography
+            className={classes.menuHeading}
+            variant="subtitle1"
+            gutterBottom
+          >
+            Branches
+          </Typography>
+          <Divider />
+          <List
+            style={{
+              marginLeft: theme.spacing(1.5),
+              padding: "0",
             }}
           >
-            <Typography sx={{ color: "#333333", minWidth: "45px" }}>
-              From:
-            </Typography>
-            <TextField
-              type="date"
-              value={fromDate}
-              onChange={(e) => {
-                setFromDate(e.target.value);
-                setDateError("");
-              }}
-              size="small"
-              error={!!dateError}
-              sx={commonTextFieldStyles}
-            />
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography sx={{ color: "#333333", minWidth: "45px" }}>
-              To:
-            </Typography>
-            <TextField
-              type="date"
-              value={toDate}
-              onChange={(e) => {
-                setToDate(e.target.value);
-                setDateError("");
-              }}
-              size="small"
-              error={!!dateError}
-              sx={commonTextFieldStyles}
-            />
-          </Box>
-          {dateError && (
-            <Typography sx={{ color: "#d32f2f", fontSize: "0.75rem" }}>
-              {dateError}
-            </Typography>
-          )}
+            {[
+              "All",
+              ...compInfo
+                ?.sort((a, b) => a.branchCode - b.branchCode)
+                .map((item, index) => item.branchName),
+            ].map((menuItem, index, array) => (
+              <React.Fragment key={index}>
+                <ListItem className={classes.listItem}>
+                  <Typography style={{ fontSize: "12px" }}>
+                    {menuItem}
+                  </Typography>
+                </ListItem>
+                {index < array.length - 1 && <Divider />}
+              </React.Fragment>
+            ))}
+          </List>
         </Box>
-      )} */}
+      </Drawer>
+
       {isMobile && (
         <Box
           style={{
@@ -483,17 +406,6 @@ const Header = ({ data }) => {
             <Typography style={{ color: "#333333", minWidth: "45px" }}>
               From:
             </Typography>
-            {/* <TextField
-              type="date"
-              value={fromDate}
-              onChange={(e) => {
-                setFromDate(e.target.value);
-                setDateError("");
-              }}
-              size="small"
-              error={!!dateError}
-              style={commonTextFieldStyles}
-            /> */}
             <DatePicker setValue={setFromDate} value={fromDate} />
           </Box>
           <Box
@@ -507,17 +419,6 @@ const Header = ({ data }) => {
             <Typography sx={{ color: "#333333", minWidth: "45px" }}>
               To:
             </Typography>
-            {/* <TextField
-              type="date"
-              value={toDate}
-              onChange={(e) => {
-                setToDate(e.target.value);
-                setDateError("");
-              }}
-              size="small"
-              error={!!dateError}
-              sx={commonTextFieldStyles}
-            /> */}
             <DatePicker setValue={setToDate} value={toDate} />
           </Box>
           {dateError && (

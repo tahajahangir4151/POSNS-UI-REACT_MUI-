@@ -9,6 +9,7 @@ import DashboardCharts from "./components/DashboardCharts";
 import NotFound from "../Containers/NotFound/NotFound";
 import SignIn from "../Containers/SignIn/SignIn";
 import { getDataFromJson } from "../utils/getDataFromJson";
+import SimpleBackdrop from "../Components/Loader";
 
 export default function DbApp() {
   const [isBaseUrlSet, setIsBaseUrlSet] = useState(false);
@@ -22,12 +23,15 @@ export default function DbApp() {
   }, []);
 
   const data = useSelector((state) => state.user?.dashboardData?.data);
-  console.log(data);
+  const isLoading = useSelector(
+    (state) => state.user?.dashboardData?.isFetching
+  );
 
   const isLoggedIn = useSelector((state) => {
     const loggedInUser = JSON.parse(localStorage.getItem("redux"));
     return (
-      (loggedInUser && !!loggedInUser.user.isLoggedIn) || state.currentUser.isLoggedIn
+      (loggedInUser && !!loggedInUser.user.isLoggedIn) ||
+      state.currentUser.isLoggedIn
     );
   });
 
@@ -52,8 +56,9 @@ export default function DbApp() {
 
   return (
     <Container maxWidth="xl" style={{ padding: 0, margin: 0 }}>
+      {isLoading && <SimpleBackdrop />}
       <Box style={{ padding: 0, margin: 0 }}>
-        <Header isLoggedIn={isLoggedIn} data={data}/>
+        <Header isLoggedIn={isLoggedIn} data={data} />
       </Box>
       <Switch>
         <Route exact path="/" component={SignIn} />

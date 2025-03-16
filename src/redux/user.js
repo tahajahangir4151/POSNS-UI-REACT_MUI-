@@ -542,7 +542,7 @@ export const updatePasswordBegin = (payload) => async (dispatch) => {
 
 // Get Dashboard Data
 
-export const getDataFromDashboard = (fromDate, toDate) => async (dispatch) => {
+export const getDataFromDashboard = (fromDate, toDate, userId) => async (dispatch) => {
   if (!isBaseUrlSet) await setBaseUrl();
 
   // debugger;
@@ -551,7 +551,7 @@ export const getDataFromDashboard = (fromDate, toDate) => async (dispatch) => {
   const formattedToDate = dayjs(toDate).format("MM-DD-YYYY hh:mm:ss A");
 
   // Construct the URL manually to prevent encoding
-  const url = `${BASE_URL}/GetDataForDashboard?fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
+  const url = `${BASE_URL}/GetDataForDashboard?fromDate=${formattedFromDate}&toDate=${formattedToDate}&userId=${userId}`;
 
   dispatch({ type: ACTIONS.GET_DASHBOARD_DATA.PENDING });
 
