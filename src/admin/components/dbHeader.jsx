@@ -27,7 +27,6 @@ import { actions, getDataFromDashboard } from "../../redux/user";
 import ChangePwd from "../../Components/ChangePwd";
 import DatePicker from "../../Components/DatePicker";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import { get } from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   inputMarginDense: {
@@ -89,7 +88,7 @@ const Header = ({ data }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
   const [open, setOpen] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
-  const initialLoadRef = useRef(false);
+  const [selectedBranchName, setSelectedBranchName] = useState("");
 
   const theme = useTheme();
   useEffect(() => {
@@ -212,27 +211,6 @@ const Header = ({ data }) => {
     };
   }, [fromDate, toDate]);
 
-  const commonTextFieldStyles = {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    borderRadius: 4,
-    width: "160px",
-    "& .MuiInputBase-root": {
-      height: "40px",
-      color: "#333333",
-    },
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: dateError ? "#d32f2f" : "transparent",
-      },
-      "&:hover fieldset": {
-        borderColor: dateError ? "#d32f2f" : "rgba(255, 255, 255, 0.3)",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: dateError ? "#d32f2f" : "#ffffff",
-      },
-    },
-  };
-
   useEffect(() => {
     if (isMobile === true) {
       if (validateDates()) {
@@ -269,7 +247,7 @@ const Header = ({ data }) => {
     }
   }, [isMobile, fromDate, toDate, dispatch]);
 
-  const handleBranchClick = (branchCode) => {
+  const handleBranchClick = (branchCode, branchName) => {
     const formattedFromDate = formatDate(fromDate, true);
     const formattedToDate = formatDate(
       new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
@@ -283,6 +261,7 @@ const Header = ({ data }) => {
         branchCode
       )
     );
+    setSelectedBranchName(branchName);
     setMobileOpen(false);
   };
 
@@ -303,6 +282,7 @@ const Header = ({ data }) => {
           compInfo[0].branchCode
         )
       );
+      setSelectedBranchName(compInfo[0].branchName);
       setInitialDataLoaded(true);
     }
   }, [initialDataLoaded, compInfo, fromDate, toDate, userId, dispatch]);
@@ -333,19 +313,32 @@ const Header = ({ data }) => {
               <MenuIcon />
             </IconButton>
           )}
-          <Typography
-            variant="h6"
-            component="div"
-            style={{
-              flexGrow: 1,
-              color: "#ffffff",
-              textAlign: isMobile ? "center" : "left",
-              fontSize: "1.1rem",
-              fontWeight: 500,
-            }}
-          >
-            {compInfo?.length > 0 && compInfo[0].compName}
-          </Typography>
+          <Box style={{ flexGrow: 1 }}>
+            <Typography
+              variant="h6"
+              component="div"
+              style={{
+                color: "#ffffff",
+                textAlign: isMobile ? "center" : "left",
+                fontSize: "1.1rem",
+                fontWeight: 500,
+              }}
+            >
+              {compInfo?.length > 0 && compInfo[0].compName}
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              component="div"
+              style={{
+                color: "#ffffff",
+                textAlign: isMobile ? "center" : "left",
+                fontSize: "0.9rem",
+                fontWeight: 400,
+              }}
+            >
+              {selectedBranchName}
+            </Typography>
+          </Box>
 
           {!isMobile && (
             <Box
@@ -517,7 +510,12 @@ const Header = ({ data }) => {
                         ? 0
                         : compInfo.find(
                             (branch) => branch.branchName === menuItem
-                          )?.branchCode
+                          )?.branchCode,
+                      menuItem === "All"
+                        ? "All Branches"
+                        : compInfo.find(
+                            (branch) => branch.branchName === menuItem
+                          )?.branchName
                     )
                   }
                 >
