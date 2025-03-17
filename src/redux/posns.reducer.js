@@ -19,6 +19,7 @@ const currentUser = (state = initialState, action) => {
         profileName: action.payload.username,
         loggedInUserId: action.payload.userId,
         userType: action.payload.userType,
+        branchCode: action.payload.branchCode,
         isLoggedIn: true,
         isFetching: false,
         jwt: action.payload.jwt,

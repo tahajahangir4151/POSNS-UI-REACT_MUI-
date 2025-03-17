@@ -30,6 +30,7 @@ const setUser = (userObj) => {
     username: userObj.username,
     userId: userObj.userId,
     userType: userObj.userType,
+    branchCode: userObj.branchCode,
   };
   localStorage.setItem("redux", JSON.stringify({ user: userData }));
 
@@ -77,7 +78,8 @@ const signIn = (userObj) => async (dispatch) => {
           setUser({
             username: response.data.fullName,
             userId: response.data.userId,
-            userType: response.data.userType, // Ensure userType is included
+            userType: response.data.userType,
+            branchCode: response.data.branchCode,
           })
         );
       } else {
@@ -545,7 +547,7 @@ export const updatePasswordBegin = (payload) => async (dispatch) => {
 // Get Dashboard Data
 
 export const getDataFromDashboard =
-  (fromDate, toDate, userId) => async (dispatch) => {
+  (fromDate, toDate, userId, branchCode) => async (dispatch) => {
     if (!isBaseUrlSet) await setBaseUrl();
 
     // debugger;
@@ -554,7 +556,7 @@ export const getDataFromDashboard =
     const formattedToDate = dayjs(toDate).format("MM-DD-YYYY hh:mm:ss A");
 
     // Construct the URL manually to prevent encoding
-    const url = `${BASE_URL}/GetDataForDashboard?fromDate=${formattedFromDate}&toDate=${formattedToDate}&userId=${userId}`;
+    const url = `${BASE_URL}/GetDataForDashboard?fromDate=${formattedFromDate}&toDate=${formattedToDate}&userId=${userId}&branchCode=${branchCode}`;
 
     dispatch({ type: ACTIONS.GET_DASHBOARD_DATA.PENDING });
 

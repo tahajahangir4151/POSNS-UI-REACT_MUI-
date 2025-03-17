@@ -27,6 +27,7 @@ import { actions, getDataFromDashboard } from "../../redux/user";
 import ChangePwd from "../../Components/ChangePwd";
 import DatePicker from "../../Components/DatePicker";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { get } from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   inputMarginDense: {
@@ -99,6 +100,7 @@ const Header = ({ data }) => {
 
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.user.loggedInUserId);
+  const branchCode = useSelector((state) => state.user.branchCode);
 
   const handleChangePassword = (
     password,
@@ -177,7 +179,14 @@ const Header = ({ data }) => {
       new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
       false
     );
-    dispatch(getDataFromDashboard(formattedFromDate, formattedToDate));
+    dispatch(
+      getDataFromDashboard(
+        formattedFromDate,
+        formattedToDate,
+        userId,
+        branchCode
+      )
+    );
   };
 
   const handleVisibilityChange = () => {
@@ -233,7 +242,12 @@ const Header = ({ data }) => {
           false
         );
         dispatch(
-          getDataFromDashboard(formattedFromDate, formattedToDate, userId)
+          getDataFromDashboard(
+            formattedFromDate,
+            formattedToDate,
+            userId,
+            branchCode
+          )
         );
       }
     } else {
@@ -244,14 +258,31 @@ const Header = ({ data }) => {
           false
         );
         dispatch(
-          getDataFromDashboard(formattedFromDate, formattedToDate, userId)
+          getDataFromDashboard(
+            formattedFromDate,
+            formattedToDate,
+            userId,
+            branchCode
+          )
         );
       }
     }
   }, [isMobile, fromDate, toDate, dispatch]);
 
   const handleBranchClick = (branchCode) => {
-    console.log("branchCode", branchCode);
+    const formattedFromDate = formatDate(fromDate, true);
+    const formattedToDate = formatDate(
+      new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
+      false
+    );
+    dispatch(
+      getDataFromDashboard(
+        formattedFromDate,
+        formattedToDate,
+        userId,
+        branchCode
+      )
+    );
     setMobileOpen(false);
   };
 
