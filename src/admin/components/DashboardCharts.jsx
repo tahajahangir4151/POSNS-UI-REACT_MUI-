@@ -133,10 +133,19 @@ const DashboardCharts = ({ data }) => {
     return <></>;
   };
 
-  const foodDataByQty = calculateQtyPercentages(
-    data?.top4ProdSalesByQty || [],
-    data?.top4ProdSalesByQty.reduce((acc, item) => acc + item.totalQty, 0) || 0
-  );
+  const totalQty =
+    data?.top4ProdSalesByQty?.reduce((acc, item) => acc + item.totalQty, 0) ||
+    0;
+
+  const foodDataByQty =
+    (data?.top4ProdSalesByQty || []).length > 0
+      ? calculateQtyPercentages(data?.top4ProdSalesByQty, totalQty)
+      : [
+          { name: "Food-1", value: 0, amount: 0 },
+          { name: "Food-2", value: 0, amount: 0 },
+          { name: "Food-3", value: 0, amount: 0 },
+          { name: "Food-4", value: 0, amount: 0 },
+        ];
 
   return (
     <Box style={{ padding: 16 }}>
@@ -258,7 +267,10 @@ const DashboardCharts = ({ data }) => {
                       >
                         {item.name}
                       </Typography>{" "}
-                      {item.totalQty} ({Math.round(item.value)}%)
+                      {item.totalQty
+                        ? Math.round(item.totalQty).toFixed(2)
+                        : "0.00"}{" "}
+                      ({Math.round(item.value)}%)
                     </Typography>
                   </Box>
                 ))}

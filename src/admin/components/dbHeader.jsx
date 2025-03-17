@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
   },
   drawerPaper: {
-    width: 180,
+    width: 200,
   },
 
   drawerHeader: {
@@ -89,6 +89,7 @@ const Header = ({ data }) => {
   const [open, setOpen] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [selectedBranchName, setSelectedBranchName] = useState("");
+  const [selectedBranchCode, setSelectedBranchCode] = useState(null);
 
   const theme = useTheme();
   useEffect(() => {
@@ -183,7 +184,7 @@ const Header = ({ data }) => {
         formattedFromDate,
         formattedToDate,
         userId,
-        branchCode
+        selectedBranchCode || branchCode
       )
     );
   };
@@ -224,7 +225,7 @@ const Header = ({ data }) => {
             formattedFromDate,
             formattedToDate,
             userId,
-            branchCode
+            selectedBranchCode || branchCode
           )
         );
       }
@@ -240,7 +241,7 @@ const Header = ({ data }) => {
             formattedFromDate,
             formattedToDate,
             userId,
-            branchCode
+            selectedBranchCode || branchCode
           )
         );
       }
@@ -261,31 +262,25 @@ const Header = ({ data }) => {
         branchCode
       )
     );
+    setSelectedBranchCode(branchCode);
     setSelectedBranchName(branchName);
     setMobileOpen(false);
   };
 
   const compInfo = Array.isArray(data?.companyInfo) ? data.companyInfo : [];
-  console.log("compInfo", compInfo);
+  // console.log("compInfo", compInfo);
   useEffect(() => {
     if (!initialDataLoaded && compInfo.length > 0) {
-      const formattedFromDate = formatDate(fromDate, true);
-      const formattedToDate = formatDate(
-        new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
-        false
+      const initialBranch = compInfo.find(
+        (branch) => branch.branchCode === branchCode
       );
-      dispatch(
-        getDataFromDashboard(
-          formattedFromDate,
-          formattedToDate,
-          userId,
-          compInfo[0].branchCode
-        )
-      );
-      setSelectedBranchName(compInfo[0].branchName);
+      if (initialBranch) {
+        setSelectedBranchName(initialBranch.branchName);
+        setSelectedBranchCode(initialBranch.branchCode);
+      }
       setInitialDataLoaded(true);
     }
-  }, [initialDataLoaded, compInfo, fromDate, toDate, userId, dispatch]);
+  }, [initialDataLoaded, compInfo, branchCode]);
 
   // const compInfo = data?.companyInfo;
   return (
@@ -519,7 +514,7 @@ const Header = ({ data }) => {
                     )
                   }
                 >
-                  <Typography style={{ fontSize: "12px" }}>
+                  <Typography style={{ fontSize: "12px", textWrap: "nowrap" }}>
                     {menuItem}
                   </Typography>
                 </ListItem>
