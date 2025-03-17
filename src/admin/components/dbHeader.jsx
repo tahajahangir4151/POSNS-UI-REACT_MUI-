@@ -287,6 +287,25 @@ const Header = ({ data }) => {
   };
 
   const compInfo = Array.isArray(data?.companyInfo) ? data.companyInfo : [];
+  console.log("compInfo", compInfo);
+  useEffect(() => {
+    if (!initialDataLoaded && compInfo.length > 0) {
+      const formattedFromDate = formatDate(fromDate, true);
+      const formattedToDate = formatDate(
+        new Date(new Date(toDate).setDate(new Date(toDate).getDate() + 1)),
+        false
+      );
+      dispatch(
+        getDataFromDashboard(
+          formattedFromDate,
+          formattedToDate,
+          userId,
+          compInfo[0].branchCode
+        )
+      );
+      setInitialDataLoaded(true);
+    }
+  }, [initialDataLoaded, compInfo, fromDate, toDate, userId, dispatch]);
 
   // const compInfo = data?.companyInfo;
   return (
@@ -484,6 +503,7 @@ const Header = ({ data }) => {
             {[
               ...(compInfo?.length > 1 ? ["All"] : []),
               ...compInfo
+                .slice()
                 ?.sort((a, b) => a.branchCode - b.branchCode)
                 .map((item, index) => item.branchName),
             ].map((menuItem, index, array) => (
