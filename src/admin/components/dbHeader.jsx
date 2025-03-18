@@ -184,7 +184,7 @@ const Header = ({ data }) => {
         formattedFromDate,
         formattedToDate,
         userId,
-        selectedBranchCode || branchCode
+        selectedBranchCode !== null ? selectedBranchCode : branchCode
       )
     );
   };
@@ -225,7 +225,7 @@ const Header = ({ data }) => {
             formattedFromDate,
             formattedToDate,
             userId,
-            selectedBranchCode || branchCode
+            selectedBranchCode !== null ? selectedBranchCode : branchCode
           )
         );
       }
@@ -241,7 +241,7 @@ const Header = ({ data }) => {
             formattedFromDate,
             formattedToDate,
             userId,
-            selectedBranchCode || branchCode
+            selectedBranchCode !== null ? selectedBranchCode : branchCode
           )
         );
       }

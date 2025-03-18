@@ -206,6 +206,7 @@ const DashboardCharts = ({ data }) => {
                         maximumFractionDigits: 2,
                       })}{" "}
                       ({Math.round(saleAnalysisData[index]?.value || 0)}%)
+                      {/* ({(saleAnalysisData[index]?.value || 0).toFixed(2)}%) */}
                     </Typography>
                   </Box>
                 ))}
