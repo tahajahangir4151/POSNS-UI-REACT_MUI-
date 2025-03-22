@@ -52,7 +52,7 @@ export default function App() {
       )}
       {userType === "w" && (
         <Container maxWidth="xl">
-          //makeStyles
+        
           <Box style={{ marginBottom: "10px" }}>
             <Header isLoggedIn={isLoggedIn} />
           </Box>
